@@ -82,6 +82,26 @@ export default function MeniuSection() {
           </div>
         ))}
 
+        {/* BUTOANE */}
+        <div className="mt-12 flex justify-center gap-4">
+          <a
+            href="#"
+            className="inline-block px-10 py-4 bg-white text-[#4a6741] font-semibold rounded-lg
+              transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-black/20 shadow-md"
+            style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', letterSpacing: '0.05em' }}
+          >
+            Înapoi
+          </a>
+          <a
+            href="#unde-suntem"
+            className="inline-block px-10 py-4 bg-[#4a6741] text-white font-semibold rounded-lg
+              transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-black/20 shadow-md"
+            style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', letterSpacing: '0.05em' }}
+          >
+            UNDE SUNTEM
+          </a>
+        </div>
+
       </div>
     </section>
   );

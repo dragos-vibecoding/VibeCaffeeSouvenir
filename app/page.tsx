@@ -15,7 +15,9 @@
 // Importăm componentele starter (versiuni simple)
 import HeroStarter from '@/components/HeroStarter';
 import NoiSection from '@/components/NoiSection';
-import MeniuSection from '@/components/MeniuSection';
+import AlatriSection from '@/components/AlatriSection';
+import UndeSuntemSection from '@/components/UndeSuntemSection';
+import AgendaSection from '@/components/AgendaSection';
 import FooterStarter from '@/components/FooterStarter';
 
 /**
@@ -37,7 +39,9 @@ export default function Home() {
 
       <HeroStarter />
       <NoiSection />
-      <MeniuSection />
+      <AlatriSection />
+      <UndeSuntemSection />
+      <AgendaSection />
       <FooterStarter />
 
       {/*

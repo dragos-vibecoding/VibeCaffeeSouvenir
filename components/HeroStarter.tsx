@@ -8,7 +8,7 @@
 
 export default function HeroStarter() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center bg-[#b5c9a8] overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center bg-[#b5c9a8]">
 
       {/* BANNER - sectiunea mediana */}
       <div className="relative w-full" style={{ height: '60vh' }}>
@@ -56,21 +56,19 @@ export default function HeroStarter() {
 
 
 
-      {/* IMAGINEA 2 - dreapta, coborata: mai mult in zona olive decat in banner */}
-      <img
-        src="/deco-2.webp"
-        alt="Decor cafea"
-        style={{
-          position: 'absolute',
-          right: '3%',
-          top: 'calc(60vh - 120px)',
-          height: '480px',
-          width: 'auto',
-          objectFit: 'contain',
-          zIndex: 10,
-          filter: 'drop-shadow(4px 8px 20px rgba(0,0,0,0.25))',
-        }}
-      />
+      {/* IMAGINEA 2 - centrata orizontal, intre banner si prima sectiune */}
+      <div className="flex justify-center w-full mt-6 mb-4">
+        <img
+          src="/deco-2.webp"
+          alt="Decor cafea"
+          style={{
+            height: '320px',
+            width: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(4px 8px 20px rgba(0,0,0,0.2))',
+          }}
+        />
+      </div>
 
     </section>
   );

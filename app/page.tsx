@@ -18,6 +18,7 @@ import NoiSection from '@/components/NoiSection';
 import AlatriSection from '@/components/AlatriSection';
 import UndeSuntemSection from '@/components/UndeSuntemSection';
 import AgendaSection from '@/components/AgendaSection';
+import SpuneSection from '@/components/SpuneSection';
 import FooterStarter from '@/components/FooterStarter';
 
 /**
@@ -42,6 +43,7 @@ export default function Home() {
       <AlatriSection />
       <UndeSuntemSection />
       <AgendaSection />
+      <SpuneSection />
       <FooterStarter />
 
       {/*

@@ -1,24 +1,20 @@
 'use client';
 
 /**
- * ⭐ SECTIUNEA SPUNE - Recenzii
+ * ⭐ SECTIUNEA SPUNE - Recenzii conectate la Supabase
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useScrollSound } from '@/lib/hooks/useScrollSound';
+import { supabase } from '@/lib/supabase';
 
 interface Recenzie {
+  id?: string;
   nume: string;
   stele: number;
   mesaj: string;
-  data: string;
+  created_at?: string;
 }
-
-const recenziiInitiale: Recenzie[] = [
-  { nume: 'Maria P.', stele: 5, mesaj: 'Cea mai buna cafea din oras. M-am intors deja de trei ori saptamana asta!', data: '12 martie 2026' },
-  { nume: 'Andrei C.', stele: 5, mesaj: 'Locul perfect pentru o dimineata linistita. Croissantul cu unt — de vis.', data: '18 martie 2026' },
-  { nume: 'Elena M.', stele: 4, mesaj: 'Atmosfera superba, cafeaua excelenta. Mi-ar placea sa fie deschisi si duminica seara.', data: '21 martie 2026' },
-];
 
 function Stele({ valoare, onClick }: { valoare: number; onClick?: (n: number) => void }) {
   const [hover, setHover] = useState(0);
@@ -41,6 +37,12 @@ function Stele({ valoare, onClick }: { valoare: number; onClick?: (n: number) =>
   );
 }
 
+function formatData(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('ro-RO', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+}
+
 export default function SpuneSection() {
   const [deschis, setDeschis] = useState(false);
   const sectionRef = useScrollSound();
@@ -48,24 +50,39 @@ export default function SpuneSection() {
   const [stele, setStele] = useState(0);
   const [mesaj, setMesaj] = useState('');
   const [nume, setNume] = useState('');
-  const [recenzii, setRecenzii] = useState<Recenzie[]>(recenziiInitiale);
+  const [recenzii, setRecenzii] = useState<Recenzie[]>([]);
   const [trimis, setTrimis] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleTrimite = (e: React.FormEvent) => {
+  // Incarca recenziile din Supabase
+  useEffect(() => {
+    supabase
+      .from('recenzii')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { if (data) setRecenzii(data); });
+  }, []);
+
+  const handleTrimite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stele || !mesaj.trim()) return;
-    const noua: Recenzie = {
-      nume: nume.trim() || 'Anonim',
-      stele,
-      mesaj: mesaj.trim(),
-      data: new Date().toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }),
-    };
-    setRecenzii(prev => [noua, ...prev]);
-    setTrimis(true);
-    setMesaj('');
-    setNume('');
-    setStele(0);
-    setTimeout(() => setTrimis(false), 3000);
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from('recenzii')
+      .insert({ nume: nume.trim() || 'Anonim', stele, mesaj: mesaj.trim() })
+      .select()
+      .single();
+
+    if (!error && data) {
+      setRecenzii(prev => [data, ...prev]);
+      setTrimis(true);
+      setMesaj('');
+      setNume('');
+      setStele(0);
+      setTimeout(() => setTrimis(false), 3000);
+    }
+    setLoading(false);
   };
 
   return (
@@ -101,7 +118,6 @@ export default function SpuneSection() {
           deschis ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'
         }`}>
 
-          {/* TITLU + DESCRIERE */}
           <p
             className="text-[#4a6741] uppercase tracking-widest text-sm mb-3 font-semibold"
             style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}
@@ -128,10 +144,8 @@ export default function SpuneSection() {
             sau mai mult data viitoare? Și fii sincer.
           </p>
 
-          {/* FORMULAR RECENZIE */}
+          {/* FORMULAR */}
           <form onSubmit={handleTrimite} className="space-y-4">
-
-            {/* Stele */}
             <div>
               <p className="text-sm text-[#3a5432] mb-2"
                  style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}>
@@ -140,10 +154,9 @@ export default function SpuneSection() {
               <Stele valoare={stele} onClick={setStele} />
             </div>
 
-            {/* Nume */}
             <input
               type="text"
-              placeholder="Numele tău (optional)"
+              placeholder="Numele tău (opțional)"
               value={nume}
               onChange={e => setNume(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-white/70 border border-[#4a6741]/20
@@ -151,7 +164,6 @@ export default function SpuneSection() {
               style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}
             />
 
-            {/* Mesaj */}
             <textarea
               required
               rows={4}
@@ -165,15 +177,14 @@ export default function SpuneSection() {
 
             <button
               type="submit"
-              disabled={!stele || !mesaj.trim()}
+              disabled={!stele || !mesaj.trim() || loading}
               className="w-full py-3 bg-[#4a6741] text-white font-semibold rounded-lg
                 transition-all duration-200 hover:scale-105 hover:shadow-lg shadow-md
                 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
               style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', letterSpacing: '0.05em' }}
             >
-              {trimis ? '✓ Multumim!' : 'TRIMITE'}
+              {trimis ? '✓ Mulțumim!' : loading ? 'Se trimite...' : 'TRIMITE'}
             </button>
-
           </form>
 
           {/* CE CRED ALTII */}
@@ -182,31 +193,40 @@ export default function SpuneSection() {
               className="text-[#3a5432] font-semibold mb-5 pb-2 border-b border-[#4a6741]/30"
               style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', fontSize: '1.2rem' }}
             >
-              Ce cred alții
+              Ce cred alții {recenzii.length > 0 && `(${recenzii.length})`}
             </h3>
 
-            <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
-              {recenzii.map((r, i) => (
-                <div key={i} className="bg-white/50 rounded-xl px-4 py-3 shadow-sm">
-                  <div className="flex justify-between items-center mb-1">
-                    <span
-                      className="text-[#2d3a2a] font-semibold text-sm"
+            {recenzii.length === 0 ? (
+              <p className="text-gray-400 text-sm italic"
+                 style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}>
+                Fii primul care lasă o recenzie.
+              </p>
+            ) : (
+              <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                {recenzii.map((r, i) => (
+                  <div key={r.id || i} className="bg-white/50 rounded-xl px-4 py-3 shadow-sm">
+                    <div className="flex justify-between items-center mb-1">
+                      <span
+                        className="text-[#2d3a2a] font-semibold text-sm"
+                        style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}
+                      >
+                        {r.nume}
+                      </span>
+                      {r.created_at && (
+                        <span className="text-gray-400 text-xs">{formatData(r.created_at)}</span>
+                      )}
+                    </div>
+                    <Stele valoare={r.stele} />
+                    <p
+                      className="text-gray-600 text-sm mt-1.5 leading-relaxed"
                       style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}
                     >
-                      {r.nume}
-                    </span>
-                    <span className="text-gray-400 text-xs">{r.data}</span>
+                      {r.mesaj}
+                    </p>
                   </div>
-                  <Stele valoare={r.stele} />
-                  <p
-                    className="text-gray-600 text-sm mt-1.5 leading-relaxed"
-                    style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}
-                  >
-                    {r.mesaj}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>

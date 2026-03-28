@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import { useScrollSound } from '@/lib/hooks/useScrollSound';
+import { supabase } from '@/lib/supabase';
 
 type Faza = 'idle' | 'calendar' | 'ore' | 'formular' | 'confirmat';
 
@@ -97,9 +98,24 @@ export default function AgendaSection() {
 
   const handleData = (d: Date) => { setDataSelectata(d); setFaza('ore'); };
   const handleOra = (o: string) => { setOraSelectata(o); setFaza('formular'); };
-  const handleConfirm = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFaza('confirmat');
+    if (!dataSelectata || !oraSelectata) return;
+    setLoading(true);
+
+    const { error } = await supabase.from('rezervari').insert({
+      nume: form.nume,
+      email: form.email,
+      telefon: form.telefon,
+      persoane: 2,
+      data_rezervare: dataSelectata.toISOString().split('T')[0],
+      ora_rezervare: oraSelectata,
+    });
+
+    if (!error) setFaza('confirmat');
+    setLoading(false);
   };
   const reset = () => { setFaza('idle'); setDataSelectata(null); setOraSelectata(null); setForm({ nume: '', email: '', telefon: '' }); };
 
@@ -237,10 +253,12 @@ export default function AgendaSection() {
                   ← înapoi
                 </button>
                 <button type="submit"
+                  disabled={loading}
                   className="flex-1 py-2.5 bg-[#4a6741] text-white font-semibold rounded-lg
-                    transition-all duration-200 hover:scale-105 hover:shadow-lg shadow-md"
+                    transition-all duration-200 hover:scale-105 hover:shadow-lg shadow-md
+                    disabled:opacity-40 disabled:cursor-not-allowed"
                   style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', letterSpacing: '0.05em' }}>
-                  CONFIRM
+                  {loading ? 'Se trimite...' : 'CONFIRM'}
                 </button>
               </div>
             </form>

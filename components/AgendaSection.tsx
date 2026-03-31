@@ -6,8 +6,12 @@
  */
 
 import { useState } from 'react';
-import { useScrollSound } from '@/lib/hooks/useScrollSound';
+import emailjs from '@emailjs/browser';
 import { supabase } from '@/lib/supabase';
+
+const EMAILJS_SERVICE = 'service_06hw0je';
+const EMAILJS_TEMPLATE = 'template_bff01zh';
+const EMAILJS_KEY = 'mCRZCyl1lCE8qAFKZ';
 
 type Faza = 'idle' | 'calendar' | 'ore' | 'formular' | 'confirmat';
 
@@ -89,9 +93,7 @@ function Calendar({ onSelect }: { onSelect: (d: Date) => void }) {
 }
 
 export default function AgendaSection() {
-  const [deschis, setDeschis] = useState(false);
   const [faza, setFaza] = useState<Faza>('idle');
-  const sectionRef = useScrollSound();
   const [dataSelectata, setDataSelectata] = useState<Date | null>(null);
   const [oraSelectata, setOraSelectata] = useState<string | null>(null);
   const [form, setForm] = useState({ nume: '', email: '', telefon: '' });
@@ -114,7 +116,21 @@ export default function AgendaSection() {
       ora_rezervare: oraSelectata,
     });
 
-    if (!error) setFaza('confirmat');
+    if (!error) {
+      await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE,
+        {
+          to_name: form.nume,
+          to_email: form.email,
+          telefon: form.telefon,
+          data_rezervare: formatData(dataSelectata),
+          ora_rezervare: oraSelectata,
+        },
+        EMAILJS_KEY
+      );
+      setFaza('confirmat');
+    }
     setLoading(false);
   };
   const reset = () => { setFaza('idle'); setDataSelectata(null); setOraSelectata(null); setForm({ nume: '', email: '', telefon: '' }); };
@@ -123,35 +139,21 @@ export default function AgendaSection() {
     `${d.getDate()} ${LUNI[d.getMonth()]} ${d.getFullYear()}`;
 
   return (
-    <section ref={sectionRef} id="agenda" className="py-20 px-6 bg-[#b5c9a8]">
+    <section id="agenda" className="py-20 px-6 bg-[#b5c9a8]">
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-        {/* IMAGINE + BUTON */}
-        <div className="flex flex-col items-center gap-4">
-          <div
-            onClick={() => setDeschis(!deschis)}
-            className="rounded-2xl overflow-hidden shadow-2xl shadow-black/40 group cursor-pointer w-full"
-          >
-            <img
-              src="/agenda-11.webp"
-              alt="Pune-ti in agenda"
-              className="w-full object-cover object-center transition-transform duration-500 ease-in-out group-hover:scale-105"
-              style={{ height: '520px' }}
-            />
-          </div>
-
-          <button
-            onClick={() => setDeschis(!deschis)}
-            className="px-10 py-3 bg-[#4a6741] text-white font-semibold rounded-lg
-              transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-black/20 shadow-md"
-            style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', letterSpacing: '0.05em' }}
-          >
-            {deschis ? 'Închide' : 'PUNE-ȚI ÎN AGENDĂ'}
-          </button>
+        {/* IMAGINE */}
+        <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/40 w-full">
+          <img
+            src="/agenda-11.webp"
+            alt="Pune-ti in agenda"
+            className="w-full object-cover object-center"
+            style={{ height: '520px' }}
+          />
         </div>
 
         {/* CONTINUT DREAPTA */}
-        <div className={`transition-all duration-500 ease-in-out ${deschis ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
+        <div>
 
           <p className="text-[#4a6741] uppercase tracking-widest text-sm mb-3 font-semibold"
              style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}>
@@ -240,6 +242,7 @@ export default function AgendaSection() {
                     placeholder={placeholder}
                     value={form[key as keyof typeof form]}
                     onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                    {...(key === 'telefon' ? { pattern: '[0-9]{10}', minLength: 10, maxLength: 10, title: 'Introduceți exact 10 cifre (ex: 0712345678)' } : {})}
                     className="w-full px-4 py-2.5 rounded-lg bg-white/70 border border-[#4a6741]/20
                       focus:outline-none focus:border-[#4a6741] text-[#2d3a2a] placeholder-gray-400 text-sm"
                     style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}

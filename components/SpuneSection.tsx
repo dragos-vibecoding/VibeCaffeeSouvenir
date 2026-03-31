@@ -5,7 +5,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useScrollSound } from '@/lib/hooks/useScrollSound';
 import { supabase } from '@/lib/supabase';
 
 interface Recenzie {
@@ -44,9 +43,6 @@ function formatData(dateStr: string) {
 }
 
 export default function SpuneSection() {
-  const [deschis, setDeschis] = useState(false);
-  const sectionRef = useScrollSound();
-
   const [stele, setStele] = useState(0);
   const [mesaj, setMesaj] = useState('');
   const [nume, setNume] = useState('');
@@ -86,37 +82,21 @@ export default function SpuneSection() {
   };
 
   return (
-    <section ref={sectionRef} id="spune" className="py-20 px-6 bg-[#b5c9a8]">
+    <section id="spune" className="py-20 px-6 bg-[#b5c9a8]">
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
-        {/* IMAGINE + BUTON */}
-        <div className="flex flex-col items-center gap-4">
-          <div
-            onClick={() => setDeschis(!deschis)}
-            className="rounded-2xl overflow-hidden shadow-2xl shadow-black/40 group cursor-pointer w-full"
-          >
-            <img
-              src="/opinie.webp"
-              alt="Spune-ne parerea ta"
-              className="w-full object-cover object-center transition-transform duration-500 ease-in-out group-hover:scale-105"
-              style={{ height: '520px' }}
-            />
-          </div>
-
-          <button
-            onClick={() => setDeschis(!deschis)}
-            className="px-10 py-3 bg-[#4a6741] text-white font-semibold rounded-lg
-              transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-black/20 shadow-md"
-            style={{ fontFamily: '"Footlight MT Light", "Footlight MT", serif', letterSpacing: '0.05em' }}
-          >
-            {deschis ? 'Închide' : 'SPUNE'}
-          </button>
+        {/* IMAGINE */}
+        <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/40 w-full">
+          <img
+            src="/opinie.webp"
+            alt="Spune-ne parerea ta"
+            className="w-full object-cover object-center"
+            style={{ height: '520px' }}
+          />
         </div>
 
         {/* CONTINUT DREAPTA */}
-        <div className={`transition-all duration-500 ease-in-out ${
-          deschis ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'
-        }`}>
+        <div>
 
           <p
             className="text-[#4a6741] uppercase tracking-widest text-sm mb-3 font-semibold"

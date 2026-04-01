@@ -22,7 +22,86 @@ const STATUS_COLORS: Record<string, string> = {
 
 const STATUSURI = ['TOATE', 'IN ASTEPTARE', 'CONFIRMAT', 'RESPINS'];
 
+function LoginForm({ onLogin }: { onLogin: () => void }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const res = await fetch('/api/admin-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (res.ok) {
+      sessionStorage.setItem('admin_auth', '1');
+      onLogin();
+    } else {
+      setError('Email sau parolă incorectă.');
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: '#b5c9a8', fontFamily: '"Footlight MT Light", "Footlight MT", serif' }}
+    >
+      <div className="backdrop-blur-md bg-white/50 rounded-2xl p-10 shadow-xl w-full max-w-sm">
+        <h1 className="text-3xl font-bold text-[#3a5432] mb-1 text-center">Admin</h1>
+        <p className="text-[#4a6741] text-sm text-center mb-8">Vibe Caffée Souvenir</p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm text-[#3a5432] mb-1">Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg bg-white/70 border border-[#4a6741]/20
+                focus:outline-none focus:border-[#4a6741] text-[#2d3a2a] text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-[#3a5432] mb-1">Parolă</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg bg-white/70 border border-[#4a6741]/20
+                focus:outline-none focus:border-[#4a6741] text-[#2d3a2a] text-sm"
+            />
+          </div>
+
+          {error && (
+            <p className="text-red-600 text-sm text-center">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 bg-[#4a6741] text-white font-semibold rounded-lg
+              transition-all duration-200 hover:scale-105 hover:shadow-lg shadow-md
+              disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Se verifică...' : 'INTRĂ'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
+  const [autentificat, setAutentificat] = useState<boolean | null>(null);
   const [rezervari, setRezervari] = useState<Rezervare[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtruStatus, setFiltruStatus] = useState('TOATE');
@@ -30,8 +109,13 @@ export default function AdminPage() {
   const [actiuneId, setActiuneId] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchRezervari();
+    const auth = sessionStorage.getItem('admin_auth');
+    setAutentificat(auth === '1');
   }, []);
+
+  useEffect(() => {
+    if (autentificat) fetchRezervari();
+  }, [autentificat]);
 
   async function fetchRezervari() {
     setLoading(true);
@@ -72,6 +156,9 @@ export default function AdminPage() {
     return potrivireStatus && potrivireNume;
   });
 
+  if (autentificat === null) return null;
+  if (!autentificat) return <LoginForm onLogin={() => setAutentificat(true)} />;
+
   return (
     <div
       className="min-h-screen px-4 py-10"
@@ -80,9 +167,17 @@ export default function AdminPage() {
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-[#3a5432] mb-1">Rezervări</h1>
-          <p className="text-[#4a6741] text-lg">Panou de administrare</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-[#3a5432] mb-1">Rezervări</h1>
+            <p className="text-[#4a6741] text-lg">Panou de administrare</p>
+          </div>
+          <button
+            onClick={() => { sessionStorage.removeItem('admin_auth'); setAutentificat(false); }}
+            className="px-4 py-2 text-sm text-[#4a6741] bg-white/50 rounded-lg hover:bg-white/70 transition-all"
+          >
+            Deconectare
+          </button>
         </div>
 
         {/* Filtre */}

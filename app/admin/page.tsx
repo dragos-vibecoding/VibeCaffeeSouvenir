@@ -121,7 +121,7 @@ export default function AdminPage() {
     setLoading(true);
     const res = await fetch('/api/rezervari');
     const data = await res.json();
-    setRezervari(data);
+    setRezervari(Array.isArray(data) ? data : []);
     setLoading(false);
   }
 

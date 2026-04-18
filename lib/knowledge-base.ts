@@ -64,6 +64,12 @@ FACILITĂȚI:
 - Spațiu interior confortabil + terasă (sezon)
 - Rezervări disponibile online
 
+NAVIGARE PE SITE — UNDE GĂSEȘTI CE:
+- Cafele și băuturi (Espresso, Specialty, Vegan, Cold Brew, Alternative): rubrica "Cafelele noastre"
+- Produse de patiserie (croissante, muffins, tarte, brownies, cheesecake): rubrica "Și ceva alături"
+- Date de contact, telefon, email, echipă: rubrica "Noi suntem"
+- Rezervări: rubrica "Agenda"
+
 MENIU COMPLET (${menuItems.length} produse):
 ${formatMeniu()}
 
@@ -81,6 +87,6 @@ REZERVĂRI:
 - Confirmare trimisă automat pe email
 
 CONTACT:
-- Telefon și email disponibile în secțiunea "Noi" de pe site
+- Telefon și email disponibile în rubrica "Noi suntem" de pe site
 - Adresă: Strada Amintirii nr. 7
 `;

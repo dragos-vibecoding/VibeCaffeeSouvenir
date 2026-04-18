@@ -41,7 +41,7 @@ export default function ChatWidget() {
       const data = await res.json();
       setMessages([...newMessages, { role: 'assistant', content: data.reply || 'Ne pare rău, a apărut o eroare.' }]);
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'Conexiune eșuată. Încearcă din nou.' }]);
+      setMessages([...newMessages, { role: 'assistant', content: 'Hopa! Nu a mers. Hai să încercăm din nou! 😃' }]);
     } finally {
       setLoading(false);
     }

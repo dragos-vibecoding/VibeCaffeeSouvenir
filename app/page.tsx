@@ -21,6 +21,7 @@ import UndeSuntemSection from '@/components/UndeSuntemSection';
 import AgendaSection from '@/components/AgendaSection';
 import SpuneSection from '@/components/SpuneSection';
 import FooterStarter from '@/components/FooterStarter';
+import ChatWidget from '@/components/ChatWidget';
 
 /**
  * 📄 COMPONENTA HOME
@@ -47,6 +48,7 @@ export default function Home() {
       <AgendaSection />
       <SpuneSection />
       <FooterStarter />
+      <ChatWidget />
 
       {/*
         📚 CONCEPTE DE ÎNVĂȚAT:

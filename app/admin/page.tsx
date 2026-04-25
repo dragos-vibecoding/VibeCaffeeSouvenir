@@ -27,6 +27,7 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uitatParola, setUitatParola] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,6 +95,20 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
           >
             {loading ? 'Se verifică...' : 'INTRĂ'}
           </button>
+
+          <button
+            type="button"
+            onClick={() => setUitatParola(v => !v)}
+            className="w-full text-sm text-[#4a6741] hover:underline text-center mt-1"
+          >
+            Ai uitat parola?
+          </button>
+
+          {uitatParola && (
+            <div className="bg-[#eef3eb] border border-[#4a6741]/30 rounded-lg px-4 py-3 text-sm text-[#3a5432] text-center">
+              Verifică fișierul <strong>Barista bot 18APR26.txt</strong> de pe Desktop — credențialele sunt salvate acolo.
+            </div>
+          )}
         </form>
       </div>
     </div>
